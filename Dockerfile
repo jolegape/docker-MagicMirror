@@ -1,18 +1,22 @@
-FROM node:12-stretch
-
-RUN apt-get update
+FROM node:12-alpine
 
 ENV NODE_ENV production
+ENV MM_PORT 8080
+
 WORKDIR /opt/magic_mirror
 
+RUN apk add --no-cache git
+
 RUN git clone --depth 1 -b master https://github.com/MichMich/MagicMirror.git .
+
 RUN cp -R modules /opt/default_modules
 RUN cp -R config /opt/default_config
-RUN npm install --unsafe-perm --silent
+RUN npm install --unsafe-perm --silent && npm audit fix
 
-COPY mm-docker-config.js docker-entrypoint.sh ./
-RUN chmod +x ./docker-entrypoint.sh
+COPY mm-docker-config.js docker-entrypoint.sh /opt/magic_mirror/
 
-EXPOSE 8080
-ENTRYPOINT ["./docker-entrypoint.sh"]
+RUN chmod +x /opt/magic_mirror/docker-entrypoint.sh
+
+EXPOSE $MM_PORT
 CMD ["node", "serveronly"]
+ENTRYPOINT ["/opt/magic_mirror/docker-entrypoint.sh"]
