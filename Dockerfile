@@ -1,5 +1,8 @@
 FROM node:12-alpine
 
+LABEL description="Alpine based docker container to run MagicMirror in server only mode"
+LABEL maintainer="jolegape"
+
 ENV NODE_ENV production
 ENV MM_PORT 8080
 
